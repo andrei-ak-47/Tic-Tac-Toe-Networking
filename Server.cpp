@@ -19,17 +19,6 @@ void FillSquare(char c, const char* numString, std::vector<std::vector<char>>& b
     int col = (num - 1) % 3;
     board[row][col] = c;
 }
-void DisplayBoard(std::vector<std::vector<char>>& board){
-    std::cout << "1.     |2.     |3.     \n";
-    std::cout << "   " << board[0][0] << "   |   " << board[0][1] << "   |   " << board[0][2] << "    \n";
-    std::cout << "_______|_______|_______\n";
-    std::cout << "4.     |5.     |6.     \n";
-    std::cout << "   " << board[1][0] << "   |   " << board[1][1] << "   |   " << board[1][2] << "    \n";
-    std::cout << "_______|_______|_______\n";
-    std::cout << "7.     |8.     |9.     \n";
-    std::cout << "   " << board[2][0] << "   |   " << board[2][1] << "   |   " << board[2][2] << "    \n";
-    std::cout << "       |       |       \n";
-}
 char checkWin(const std::vector<std::vector<char>>& board) {
     // Check rows and columns
     for(int i = 0; i < 3; i++) {
@@ -75,7 +64,7 @@ int main(){
 
     bind(MainSocket, (sockaddr*)&serverAddr, sizeof(serverAddr));
     listen(MainSocket, 2);
-    std::cout << "CONNECTED!\n";
+
     int numOfClients = 0;
     bool p1Role = static_cast<bool>(rand() % 2);
     SOCKET playerSockets[2];
@@ -98,7 +87,6 @@ int main(){
         PlayerCharacter[0] = 'O';
         PlayerCharacter[1] = 'X';
     }
-    std::cout << "Both Players Connected...\n";
 
     // ===BOTH PLAYERS CONNECTED AND READY TO PLAY NOW===
     //              ===GAME LOOP BELOW===
@@ -108,13 +96,10 @@ int main(){
     bool running = true;
     char winner = ' ';
     char CurrentPlayer = 'X';// X goes first
-    //std::cout << "SENT INITIAL BOARD\n";
-    //SendBoardToPlayers(board, playerSockets);
-    //std::cout << "BOARD SENT\n";
+
     Sleep(2000);
-    std::cout << "STARTING\n";
+
     while(running){
-        DisplayBoard(board);
         int CurrentPlayersIndex = (CurrentPlayer == 'X') ? 0 : 1;
         int OppPlayerIndex = (CurrentPlayersIndex == 1) ? 0 : 1;
         SendBoardToPlayers(board, playerSockets);
@@ -122,16 +107,15 @@ int main(){
         //Send Curr and Opp Players if theyre allowed to go or not
         char turnSignal = '1';
         send(playerSockets[CurrentPlayersIndex], &turnSignal, 1, 0);
-        std::cout << "Sent Player " << CurrentPlayersIndex + 1 << ": " << turnSignal << " (Turn Signal)\n";
+
         turnSignal = '0';  
         send(playerSockets[OppPlayerIndex], &turnSignal, 1, 0);
-        std::cout << "Sent Player " << OppPlayerIndex + 1 << ": " << turnSignal << " (Turn Signal)\n";
+
         Sleep(150);
-        std::cout << "Waiting for player " << CurrentPlayersIndex + 1 << "s move...\n";
+
         char buffer[10];
         int bytes = recv(playerSockets[CurrentPlayersIndex], buffer, sizeof(buffer) - 1, 0);
         if(bytes > 0){
-            std::cout << "We got here...\n";
             buffer[bytes] = '\0';
             std::cout << buffer << '\n';
             FillSquare(PlayerCharacter[CurrentPlayersIndex], buffer, board, UsedCells);

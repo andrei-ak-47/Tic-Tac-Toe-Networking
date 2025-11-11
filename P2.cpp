@@ -21,7 +21,25 @@ void DisplayBoard(char boardStr[10]){
     std::cout << "       |       |       \n";
 }
 
-int main(){
+int main(int argc, char* argv[]){
+    // Handle command line arguments
+    std::string serverIP = "127.0.0.1";  // Default to localhost
+    
+    if(argc > 1) {
+        serverIP = argv[1];  // Use first command line argument as IP
+        std::cout << "Connecting to server: " << serverIP << "\n";
+    } else {
+        // No IP provided - ask user
+        std::cout << "No server IP provided.\n";
+        std::cout << "Enter server IP (default: 127.0.0.1): ";
+        std::string input;
+        std::getline(std::cin, input);
+        if(!input.empty()) {
+            serverIP = input;
+        }
+        std::cout << "Connecting to: " << serverIP << "\n";
+    }
+
     WSAData wsa;
     WSAStartup(MAKEWORD(2, 2), &wsa);
     
@@ -30,65 +48,52 @@ int main(){
     sockaddr_in ClientAddr;
     ClientAddr.sin_family = AF_INET;
     ClientAddr.sin_port = htons(8080);
-    inet_pton(AF_INET, "192.168.0.39", &ClientAddr.sin_addr);
+    inet_pton(AF_INET, serverIP.c_str(), &ClientAddr.sin_addr);  // Use dynamic IP
     
+    // Rest of your existing client code...
     connect(ClientSocket, (sockaddr*)&ClientAddr, sizeof(ClientAddr));
-    std::cout << "CONNECTED!";
+    //std::cout << "CONNECTED!";
     
     bool running = true;
     char character;
-    char boardStr[10] = "         ";  // Initialize with spaces
+    char boardStr[10] = "         ";
     
-    recv(ClientSocket, &character, 1, 0);  // Get character (X/O)
+    recv(ClientSocket, &character, 1, 0);
     std::cout << "You are: " << character << '\n';
     
     char YourTurn;
     
     while(running){
         char data[100];
-        
-        // Receive any data from server
         int bytes = recv(ClientSocket, data, sizeof(data) - 1, 0);
         
         if(bytes > 0){
             data[bytes] = '\0';
             
-            // DEBUG: Show what we received
-            std::cout << "DEBUG: Received " << bytes << " bytes: [";
-            for(int i = 0; i < bytes && i < 20; i++){
-                if(data[i] == ' ') std::cout << '_';
-                else std::cout << data[i];
-            }
-            std::cout << "]\n";
-            
-            // Check if this is BOARD data (18 bytes: 9 chars + 9 spaces)
             if(bytes == 18) {
-                // Extract board characters (skip the spaces)
+                // Board data
                 int boardIndex = 0;
                 for(int i = 0; i < 18 && boardIndex < 9; i += 2) {
                     boardStr[boardIndex++] = data[i];
                 }
                 boardStr[9] = '\0';
-                std::cout << "UPDATED BOARD:\n";
+                //std::cout << "🔄 UPDATED BOARD:\n";
                 DisplayBoard(boardStr);
             }
-            // Check if this is TURN signal (1 byte)
             else if(bytes == 1) {
+                // Turn signal
                 YourTurn = data[0];
                 if(YourTurn == '1'){
-                    std::cout << "YOUR TURN! Enter move (1-9): ";
+                    std::cout << "🎯 YOUR TURN! Enter move (1-9): ";
                     char ChosenSquare;
                     std::cin >> ChosenSquare;
                     send(ClientSocket, &ChosenSquare, 1, 0);
-                    std::cout << "Sent move: " << ChosenSquare << "\n";
                 }
                 else if(YourTurn == '0'){
-                    std::cout << "Waiting for opponent...\n";
+                    std::cout << "⏳ Waiting for opponent...\n";
                 }
             }
-            // Check for game over message
             else if(bytes > 10 && std::string(data).find("GAME OVER") != std::string::npos) {
-                DisplayBoard(boardStr);
                 std::cout << data << '\n';
                 running = false;
             }
