@@ -1,63 +1,57 @@
 @echo off
-title Tic-Tac-Toe LAN Multiplayer Launcher
+title 🎮 Tic-Tac-Toe Launcher
 echo ========================================
-echo    TIC-TAC-TOE LAN MULTIPLAYER LAUNCHER
+echo    TIC-TAC-TOE MULTIPLAYER LAUNCHER
 echo ========================================
 echo.
 
-echo Step 1: Finding your network IP...
-for /f "tokens=2 delims=:" %%i in ('ipconfig ^| findstr "IPv4"') do (
-    set SERVER_IP=%%i
-    goto :IPFound
+echo 🔍 Checking if files exist...
+if not exist "Server.exe" (
+    echo ❌ Server.exe not found! Run compile.bat first.
+    pause
+    exit /b
 )
-:IPFound
-set SERVER_IP=%SERVER_IP: =%
-echo Server IP Address: %SERVER_IP%
-echo.
-
-echo Step 2: Compiling files...
-echo Compiling Server...
-g++ -o Server.exe Server.cpp -lws2_32
-if %errorlevel% neq 0 (
-    echo ERROR: Server compilation failed!
+if not exist "P1.exe" (
+    echo ❌ P1.exe not found! Run compile.bat first.
+    pause
+    exit /b
+)
+if not exist "P2.exe" (
+    echo ❌ P2.exe not found! Run compile.bat first.
     pause
     exit /b
 )
 
-echo Compiling Client...
-g++ -o Client.exe Client.cpp -lws2_32
-if %errorlevel% neq 0 (
-    echo ERROR: Client compilation failed!
-    pause
-    exit /b
-)
+echo ✅ All game files found!
+echo.
+echo 🚀 Launching game...
+echo.
+
+echo 1. Starting SERVER (run this FIRST)...
+timeout 1 >nul
+start "🎮 Tic-Tac-Toe SERVER" cmd /k "echo 🖥️  SERVER RUNNING - Waiting for players... && echo ⏳ Please wait for 'Both Players Connected' message && echo. && Server.exe"
 
 echo.
-echo Step 3: Starting game...
-echo.
-echo 🖥️  Starting SERVER (run this on the host computer)...
-start "🎮 Tic-Tac-Toe SERVER" cmd /k "cd /d %~dp0 && echo ✅ SERVER RUNNING - IP: %SERVER_IP% && echo Waiting for players... && Server.exe"
-
+echo 2. Starting PLAYER 1 in 3 seconds...
 timeout 3 >nul
+start "👤 Player 1" cmd /k "echo 👤 PLAYER 1 CONNECTING... && P1.exe"
 
 echo.
-echo 👤 Starting CLIENT 1 (use this or share IP with other players)...
-start "👤 Player 1" cmd /k "cd /d %~dp0 && echo ✅ Connect using IP: %SERVER_IP% && echo Running client... && Client.exe %SERVER_IP%"
-
-timeout 2 >nul
-
-echo 👤 Starting CLIENT 2 (second player on this computer)...
-start "👤 Player 2" cmd /k "cd /d %~dp0 && echo ✅ Connected to: %SERVER_IP% && echo Running client... && Client.exe %SERVER_IP%"
+echo 3. Starting PLAYER 2 in 3 seconds...  
+timeout 3 >nul
+start "👤 Player 2" cmd /k "echo 👤 PLAYER 2 CONNECTING... && P2.exe"
 
 echo.
 echo ========================================
-echo 🎮 GAME LAUNCHED!
+echo 🎉 GAME LAUNCHED!
 echo ========================================
 echo.
-echo TO PLAY ACROSS COMPUTERS:
-echo 1. Share this IP with other players: %SERVER_IP%
-echo 2. On other computers, run: Client.exe %SERVER_IP%
-echo 3. Or use the pre-compiled Client.exe with the IP
+echo 📋 INSTRUCTIONS:
+echo 1. Wait for SERVER to say "Both Players Connected"
+echo 2. Players take turns entering moves (1-9)
+echo 3. First player to get 3 in a row wins!
+echo.
+echo 🎯 TIP: Make sure all 3 windows are visible
 echo.
 echo Press any key to close this launcher...
 pause >nul
