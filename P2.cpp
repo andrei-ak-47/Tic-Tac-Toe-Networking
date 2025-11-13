@@ -39,7 +39,7 @@ int main(int argc, char* argv[]){
         }
         std::cout << "Connecting to: " << serverIP << "\n";
     }
-
+    
     WSAData wsa;
     WSAStartup(MAKEWORD(2, 2), &wsa);
     
@@ -52,7 +52,6 @@ int main(int argc, char* argv[]){
     
     // Rest of your existing client code...
     connect(ClientSocket, (sockaddr*)&ClientAddr, sizeof(ClientAddr));
-    //std::cout << "CONNECTED!";
     
     bool running = true;
     char character;
