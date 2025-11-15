@@ -6,15 +6,23 @@ echo ========================================
 echo.
 
 echo 🖥️  Compiling Server...
-g++ -o Server.exe Server.cpp -lws2_32
+g++ -o Server.exe Server.cpp -lws2_32 -std=c++11
 if %errorlevel% neq 0 (
     echo ❌ SERVER COMPILATION FAILED!
     pause
     exit /b
 )
 
+echo 🌐 Compiling HTTPServer...
+g++ -o HTTPServer.exe HTTPServer.cpp -lws2_32 -std=c++11
+if %errorlevel% neq 0 (
+    echo ❌ HTTPSERVER COMPILATION FAILED!
+    pause
+    exit /b
+)
+
 echo 👤 Compiling Player 1...
-g++ -o P1.exe P1.cpp -lws2_32
+g++ -o P1.exe P1.cpp -lws2_32 -std=c++11
 if %errorlevel% neq 0 (
     echo ❌ PLAYER 1 COMPILATION FAILED!
     pause
@@ -22,7 +30,7 @@ if %errorlevel% neq 0 (
 )
 
 echo 👤 Compiling Player 2...
-g++ -o P2.exe P2.cpp -lws2_32
+g++ -o P2.exe P2.cpp -lws2_32 -std=c++11
 if %errorlevel% neq 0 (
     echo ❌ PLAYER 2 COMPILATION FAILED!
     pause
@@ -36,6 +44,7 @@ echo ========================================
 echo.
 echo 📁 Files created:
 echo    Server.exe - Game server
+echo    HTTPServer.exe - Results web server
 echo    P1.exe - Player 1 client  
 echo    P2.exe - Player 2 client
 echo.

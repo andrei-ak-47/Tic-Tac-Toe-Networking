@@ -1,57 +1,35 @@
 @echo off
-title 🎮 Tic-Tac-Toe Launcher
+title 🎮 Tic-Tac-Toe LAN Party
 echo ========================================
-echo    TIC-TAC-TOE MULTIPLAYER LAUNCHER
+echo      TIC-TAC-TOE LAUNCHER
 echo ========================================
 echo.
 
-echo 🔍 Checking if files exist...
-if not exist "Server.exe" (
-    echo ❌ Server.exe not found! Run compile.bat first.
-    pause
-    exit /b
-)
-if not exist "P1.exe" (
-    echo ❌ P1.exe not found! Run compile.bat first.
-    pause
-    exit /b
-)
-if not exist "P2.exe" (
-    echo ❌ P2.exe not found! Run compile.bat first.
-    pause
-    exit /b
-)
+echo 🔄 Starting HTTPServer (Results Page)...
+start "HTTPServer" HTTPServer.exe
 
-echo ✅ All game files found!
-echo.
-echo 🚀 Launching game...
-echo.
+echo ⏳ Waiting for HTTPServer to start...
+timeout /t 2 /nobreak >nul
 
-echo 1. Starting SERVER (run this FIRST)...
-timeout 1 >nul
-start "🎮 Tic-Tac-Toe SERVER" cmd /k "echo 🖥️  SERVER RUNNING - Waiting for players... && echo ⏳ Please wait for 'Both Players Connected' message && echo. && Server.exe"
+echo 🎯 Starting Game Server...
+start "Game Server" Server.exe
 
-echo.
-echo 2. Starting PLAYER 1 in 3 seconds...
-timeout 3 >nul
-start "👤 Player 1" cmd /k "echo 👤 PLAYER 1 CONNECTING... && P1.exe"
+echo ⏳ Waiting for Game Server to start...
+timeout /t 2 /nobreak >nul
 
-echo.
-echo 3. Starting PLAYER 2 in 3 seconds...  
-timeout 3 >nul
-start "👤 Player 2" cmd /k "echo 👤 PLAYER 2 CONNECTING... && P2.exe"
+echo 👤 Starting Player 1...
+start "Player 1" P1.exe
+
+echo 👤 Starting Player 2... 
+start "Player 2" P2.exe
 
 echo.
 echo ========================================
-echo 🎉 GAME LAUNCHED!
+echo 🚀 ALL COMPONENTS STARTED!
 echo ========================================
 echo.
-echo 📋 INSTRUCTIONS:
-echo 1. Wait for SERVER to say "Both Players Connected"
-echo 2. Players take turns entering moves (1-9)
-echo 3. First player to get 3 in a row wins!
+echo 📊 View results at: http://localhost:8081
 echo.
-echo 🎯 TIP: Make sure all 3 windows are visible
+echo 💡 Close all windows to stop the game
 echo.
-echo Press any key to close this launcher...
-pause >nul
+pause
